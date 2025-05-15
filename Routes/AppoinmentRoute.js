@@ -15,4 +15,14 @@ router.post('/post',async(req,res)=>{
     }
 })
 
+
+router.get('/get', async (req, res) => {
+    try {
+        const data = await appointmentModel.find();
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(400).json(error);
+    }
+});
+
 module.exports = router

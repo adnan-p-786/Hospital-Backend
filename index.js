@@ -10,6 +10,7 @@ app.use(cors({
 app.use(express.json())
 
 app.use('/api/appointment',require('./Routes/AppoinmentRoute'))
+app.use('/api/contact',require('./Routes/ContactRoute'))
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
