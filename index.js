@@ -5,12 +5,14 @@ const port = 3000
 const cors =require('cors')
 
 app.use(cors({
-  origin: 'http://localhost:5174'
+  origin: 'http://localhost:5173'
 }))
 app.use(express.json())
 
 app.use('/api/appointment',require('./Routes/AppoinmentRoute'))
 app.use('/api/contact',require('./Routes/ContactRoute'))
+app.use('/api/department',require('./Routes/DepartmentRoute'))
+app.use('/api/doctor',require('./Routes/DoctorRoute'))
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
