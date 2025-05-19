@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 
 const uploadImg = multer({ storage: storage });
 
-  router.get("/images/:imageName", (req, res) => {
+  router.get("/upload/images/:imageName", (req, res) => {
     const imageName = req.params.imageName;
     // console.log(imageName);
     
@@ -31,10 +31,9 @@ const uploadImg = multer({ storage: storage });
 
 
 
-
 router.post('/post',uploadImg.single("image"),async(req,res)=>{
     try {
-      const image_url = `http://localhost:3000/api/images/${req.file.filename}`;
+      const image_url = `http://localhost:3000/api/doctor/upload/images/${req.file.filename}`;
         const {Name,Department} =req.body
         if (!Name || !Department){
             return res.status(400).json({message: "Name and Department are required"})
@@ -58,7 +57,7 @@ router.get('/get', async (req, res) => {
 
 router.delete('/delete/:id', async (req, res) => {
     try {
-      const id = req.params.id; // Get id from request body
+      const id = req.params.id; 
       const deleteData = await doctormodel.findByIdAndDelete(id);
       if (!deleteData) {
         return res.status(404).json({ message: "doctor not found" });
