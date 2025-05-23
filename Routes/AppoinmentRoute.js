@@ -25,4 +25,18 @@ router.get('/get', async (req, res) => {
     }
 });
 
+router.get('/get-by-doctor', async (req, res) => {
+    try {
+        const { doctor } = req.query
+        if (!doctor) {
+            return res.status(400).json({ message: 'Doctor name is required' })
+        }
+
+        const appointments = await appointmentModel.find({ Doctor: doctor })
+        res.status(200).json(appointments)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
 module.exports = router

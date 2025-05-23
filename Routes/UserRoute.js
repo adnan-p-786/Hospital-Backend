@@ -5,88 +5,97 @@ const jwt = require('jsonwebtoken')
 
 const router = express.Router()
 
+// Create Doctor/Admin
 router.post('/create', async (req, res) => {
     try {
-        const { Name, Email, Password } = req.body
-        if (!Name || !Email || !Password) {
-            return res.status(400).json({ message: "Name,email and password are required" })
+        const { Name, Email, Password, Role } = req.body
+
+        if (!Name || !Email || !Password || !Role) {
+            return res.status(400).json({ message: "Name, Email, Password, and Role are required" })
         }
-        // Check if the email already exists
+
+        if (!['Doctor', 'Admin'].includes(Role)) {
+            return res.status(400).json({ message: "Role must be either 'Doctor' or 'Admin'" })
+        }
+
         const existingUser = await userModel.findOne({ Email });
         if (existingUser) {
             return res.status(400).json({ message: "Email already in use" });
         }
 
-        //hashing user password
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(Password, salt);
-        const newData = await userModel.create({ Name: Name, Email: Email, Password: hashedPassword })
-        //create token
-        const token = jwt.sign({ id: newData._id }, process.env.JWT_SECRET);
-        // res.json({ success: true, token });
+
+        const newUser = await userModel.create({
+            Name,
+            Email,
+            Password: hashedPassword,
+            Role
+        });
+
+        const token = jwt.sign({ id: newUser._id, role: newUser.Role }, process.env.JWT_SECRET);
 
         return res.status(201).json({
             success: true,
             token,
-            user: newData,
+            user: {
+                id: newUser._id,
+                Name: newUser.Name,
+                Email: newUser.Email,
+                Role: newUser.Role
+            }
         });
 
     } catch (error) {
-        res.status(400).json(error)
+        res.status(500).json({ message: 'Server error', error });
     }
-})
+});
 
-
-
-router.get('/get',async(req,res)=>{
+// Get all users (admin only, typically)
+router.get('/get', async (req, res) => {
     try {
-        const user = await userModel.find()
-        res.status(200).json(user)
+        const users = await userModel.find();
+        res.status(200).json(users);
     } catch (error) {
-        res.status(400).json(error)
+        res.status(500).json({ message: 'Server error', error });
     }
-})
+});
 
-
-
-
-
-//api for using login
-
+// Login Doctor/Admin
 router.post('/login', async (req, res) => {
     try {
         const { Email, Password } = req.body;
 
         if (!Email || !Password) {
-            return res
-                .status(400)
-                .json({ message: "Email and password are required" });
+            return res.status(400).json({ message: "Email and password are required" });
         }
 
         const user = await userModel.findOne({ Email });
-        console.log(user);
 
         if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, message: "User does not exist" });
+            return res.status(404).json({ success: false, message: "User does not exist" });
         }
+
         const isMatch = await bcrypt.compare(Password, user.Password);
-        if (isMatch) {
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-            res.json({ success: true,data:{
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign({ id: user._id, role: user.Role }, process.env.JWT_SECRET);
+
+        res.status(200).json({
+            success: true,
+            data: {
                 token,
-                Email,
-                id:user.id
-            }  }).status(200);
-          } else {
-            res.json({ success: false, message: "Invalid credentials" });
-          }
+                id: user._id,
+                Email: user.Email,
+                Role: user.Role
+            }
+        });
+
     } catch (error) {
-        res.status(400).json(error)
+        res.status(500).json({ message: 'Server error', error });
     }
-})
+});
 
-
-module.exports = router
+module.exports = router;
