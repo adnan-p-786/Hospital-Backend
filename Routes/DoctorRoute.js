@@ -34,14 +34,14 @@ const uploadImg = multer({ storage: storage });
 router.post('/post',uploadImg.single("image"),async(req,res)=>{
     try {
       const image_url = `http://localhost:3000/api/doctor/upload/images/${req.file.filename}`;
-        const {Name,DepartmentId} =req.body
+        const {Name,Email,Password,DepartmentId} =req.body
         console.log({Name});
         console.log({DepartmentId});
         
-        if (!Name || !DepartmentId){
+        if (!Name || !DepartmentId ||!Email ||!Password){
             return res.status(400).json({message: "Name and Department are required"})
         }
-        const newData = await doctormodel.create({Name:Name, DepartmentId:DepartmentId,image: image_url})
+        const newData = await doctormodel.create({Name:Name,Email:Email,Password:Password, DepartmentId:DepartmentId,image: image_url})
         res.status(201).json(newData)
     } catch (error) {
         res.status(400).json(error)

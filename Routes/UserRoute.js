@@ -64,10 +64,10 @@ router.get('/get', async (req, res) => {
 // Login Doctor/Admin
 router.post('/login', async (req, res) => {
     try {
-        const { Email, Password } = req.body;
+        const { Email, Password , Role } = req.body;
 
-        if (!Email || !Password) {
-            return res.status(400).json({ message: "Email and password are required" });
+        if (!Email || !Password ||!Role) {
+            return res.status(400).json({ message: "Email, Role and password are required" });
         }
 
         const user = await userModel.findOne({ Email });

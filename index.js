@@ -15,10 +15,15 @@ app.use('/api/department',require('./Routes/DepartmentRoute'))
 app.use('/api/doctor',require('./Routes/DoctorRoute'))
 app.use('/api/user',require('./Routes/UserRoute'))
 app.use('/api/images', express.static('upload/images'));
+
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
+
 connectDB()
+
 app.listen(port, () => {
   console.log(`app listening on port ${port}`)
 }) 
