@@ -13,6 +13,7 @@ app.use('/api/appointment',require('./Routes/AppoinmentRoute'))
 app.use('/api/contact',require('./Routes/ContactRoute'))
 app.use('/api/department',require('./Routes/DepartmentRoute'))
 app.use('/api/doctor',require('./Routes/DoctorRoute'))
+app.use('/api/doctor',require('./Routes/DoctorLogin'))
 app.use('/api/user',require('./Routes/UserRoute'))
 app.use('/api/images', express.static('upload/images'));
 
